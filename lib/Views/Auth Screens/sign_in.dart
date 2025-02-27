@@ -192,12 +192,13 @@ class _SignInScreenState extends State<SignInScreen> {
         });
 
         var finalData = responseData["data"];
+
         var token = finalData["token"];
         var user = finalData["id"];
         var userName = finalData["name"];
         var userType = finalData["type"];
-        var userRole = finalData["role"];
-
+        var userRole = finalData["type"];
+        print("object$userRole");
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString(PrefKey.authorization, token ?? '');
         prefs.setString(PrefKey.id, user.toString());
