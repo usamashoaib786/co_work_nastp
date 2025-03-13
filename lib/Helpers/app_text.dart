@@ -2,12 +2,13 @@ import 'package:co_work_nastp/Helpers/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class AppText {
-  static Widget  appText(String text,
+  static Widget appText(String text,
       {TextAlign? textAlign,
       Color? textColor,
       double? fontSize,
       FontWeight? fontWeight,
       FontStyle? fontStyle,
+      bool? softWrap,
       TextBaseline? textBaseline,
       TextOverflow? overflow,
       int? maxlines,
@@ -15,6 +16,7 @@ class AppText {
       bool underLine = false,
       bool fontFamily = false}) {
     return Text(
+      softWrap: softWrap,
       text,
       textAlign: textAlign,
       maxLines: maxlines,

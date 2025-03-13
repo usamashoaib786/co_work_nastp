@@ -62,9 +62,13 @@ class AppDioInterceptor extends Interceptor {
 
     options.baseUrl = AppUrls.baseUrl;
     if (token.isNotEmpty) {
-      options.headers.addAll({RequestHeader.authorization: "Bearer $token"});
+      options.headers.addAll({RequestHeader.authorization: "Bearer $token",
+      });
     }
+    String branch = "cowork-nastp"; // Set your default branch
 
+    // Add the 'branch' header
+    options.headers.addAll({"branch": branch});
     Map<String, dynamic> er = {
       "base_url": options.baseUrl,
       "end_point": options.path,

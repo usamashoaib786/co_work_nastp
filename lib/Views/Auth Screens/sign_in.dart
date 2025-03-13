@@ -180,7 +180,7 @@ class _SignInScreenState extends State<SignInScreen> {
     };
 
     try {
-      Response response = await dio.post(path: AppUrls.logIn, data: params);
+      Response response = await dio.post(path: "https://api.coworkatnastp.com/api/branch/login", data: params);
       var responseData = response.data;
 
       if (response.statusCode == 200) {
@@ -229,4 +229,5 @@ class _SignInScreenState extends State<SignInScreen> {
       });
     }
   }
+
 }

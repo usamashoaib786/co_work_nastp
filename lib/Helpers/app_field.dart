@@ -69,7 +69,7 @@ class _CustomAppFormFieldState extends State<CustomAppFormField> {
   Widget build(BuildContext context) {
     return Container(
       height: 60,
-      width: MediaQuery.of(context).size.width,
+      width: widget.width ?? MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
           border: Border.all(color: AppTheme.appColor),
           color: widget.bgcolor ?? Color(0xffF1F4FF),
@@ -77,12 +77,14 @@ class _CustomAppFormFieldState extends State<CustomAppFormField> {
       child: TextField(
         controller: widget.controller,
         cursorColor: AppTheme.appColor,
+        onChanged: widget.onChanged,
         keyboardType: widget.txtType ?? TextInputType.name,
         decoration: InputDecoration(
             prefixIcon: widget.prefixIcon,
             prefixIconConstraints: const BoxConstraints(
               minWidth: 50,
             ),
+            
             border: InputBorder.none,
             contentPadding: const EdgeInsets.all(15),
             hintText: widget.texthint,
@@ -205,7 +207,6 @@ class _CustomAppPasswordfieldState extends State<CustomAppPasswordfield> {
   }
 }
 
-
 class FloatingLabelTextField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
@@ -228,7 +229,8 @@ class FloatingLabelTextField extends StatelessWidget {
         labelStyle: TextStyle(color: Colors.black),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: AppTheme.appColor.withValues(alpha: 0.5), width: 2),
+          borderSide: BorderSide(
+              color: AppTheme.appColor.withValues(alpha: 0.5), width: 2),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),

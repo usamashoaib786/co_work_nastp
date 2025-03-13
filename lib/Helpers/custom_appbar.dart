@@ -6,9 +6,10 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Color? color;
   final Color? bgcolor;
   final Color? cicleColor;
+  final Color? buttonColor;
   final bool? leadIcon;
 
-  const CustomAppBar({super.key, this.txt, this.color, this.cicleColor, this.leadIcon, this.bgcolor});
+  const CustomAppBar({super.key, this.txt, this.color, this.cicleColor, this.leadIcon, this.bgcolor, this.buttonColor});
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -47,6 +48,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     child: Image.asset(
                       "assets/images/arrow.png",
                       height: 40,
+                      color: widget.buttonColor,
                     ),
                   ),
                 ),
