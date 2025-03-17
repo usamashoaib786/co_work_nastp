@@ -73,7 +73,7 @@ class _CustomAppFormFieldState extends State<CustomAppFormField> {
       decoration: BoxDecoration(
           border: Border.all(color: AppTheme.appColor),
           color: widget.bgcolor ?? Color(0xffF1F4FF),
-          borderRadius: BorderRadius.circular(15)),
+          borderRadius: BorderRadius.circular(10)),
       child: TextField(
         controller: widget.controller,
         cursorColor: AppTheme.appColor,
@@ -82,7 +82,7 @@ class _CustomAppFormFieldState extends State<CustomAppFormField> {
         decoration: InputDecoration(
             prefixIcon: widget.prefixIcon,
             prefixIconConstraints: const BoxConstraints(
-              minWidth: 50,
+              minWidth: 40,
             ),
             
             border: InputBorder.none,
@@ -168,7 +168,7 @@ class _CustomAppPasswordfieldState extends State<CustomAppPasswordfield> {
         decoration: BoxDecoration(
             border: Border.all(color: AppTheme.appColor),
             color: Color(0xffF1F4FF),
-            borderRadius: BorderRadius.circular(15)),
+            borderRadius: BorderRadius.circular(10)),
         child: TextFormField(
           controller: widget.controller,
           cursorColor: AppTheme.appColor,

@@ -116,11 +116,11 @@ class _BookingStatusState extends State<BookingStatus> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        txt: "Booking Status",
+        txt: "Booking",
         leadIcon: true,
-        buttonColor: AppTheme.white,
+        buttonColor: AppTheme.appColor,
         color: AppTheme.appColor,
-        cicleColor: AppTheme.appColor,
+        cicleColor: AppTheme.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(15),
@@ -130,7 +130,11 @@ class _BookingStatusState extends State<BookingStatus> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CustomAppFormField(
-                  texthint: "Search by name",
+                  texthint: "Search...",
+                  prefixIcon: Icon(
+                    Icons.search,
+                    size: 30,
+                  ),
                   controller: _controller,
                   width: ScreenSize(context).width * 0.7,
                   bgcolor: Color(0xffF4F4F4),
@@ -146,10 +150,9 @@ class _BookingStatusState extends State<BookingStatus> {
                     height: 60,
                     width: ScreenSize(context).width * 0.20,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Color(0xffF4F4F4),
-                      border: Border.all(color: AppTheme.black)
-                    ),
+                        borderRadius: BorderRadius.circular(10),
+                        color: Color(0xffF4F4F4),
+                        border: Border.all(color: AppTheme.black)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -255,7 +258,7 @@ class _BookingStatusState extends State<BookingStatus> {
                                             img1: "assets/images/room.png",
                                             txt3: "Floor:",
                                             txt4: "${booking['floor']}",
-                                            img2: "assets/images/room.png"),
+                                            img2: "assets/images/floor.png"),
                                         Container(
                                           height: 1,
                                           width: ScreenSize(context).width,
@@ -263,8 +266,7 @@ class _BookingStatusState extends State<BookingStatus> {
                                         ),
                                         Center(
                                           child: Container(
-                                            width:
-                                                ScreenSize(context).width * 0.5,
+                                            width: 130,
                                             height: 50,
                                             decoration: BoxDecoration(
                                                 color: getStatusColor(
@@ -370,9 +372,9 @@ class _BookingStatusState extends State<BookingStatus> {
                                                     txt4:
                                                         " ${booking['startTime']} - ${booking['endTime']}",
                                                     img1:
-                                                        "assets/images/room.png",
+                                                        "assets/images/calendar.png",
                                                     img2:
-                                                        "assets/images/room.png"),
+                                                        "assets/images/clock.png"),
                                                 customRow(
                                                     txt1: "Room:",
                                                     txt2: "${booking['room']}",
@@ -381,7 +383,7 @@ class _BookingStatusState extends State<BookingStatus> {
                                                     txt3: "Floor:",
                                                     txt4: "${booking['floor']}",
                                                     img2:
-                                                        "assets/images/room.png"),
+                                                        "assets/images/floor.png"),
                                                 Container(
                                                   height: 1,
                                                   width:
@@ -390,9 +392,7 @@ class _BookingStatusState extends State<BookingStatus> {
                                                 ),
                                                 Center(
                                                   child: Container(
-                                                    width: ScreenSize(context)
-                                                            .width *
-                                                        0.5,
+                                                    width: 130,
                                                     height: 50,
                                                     decoration: BoxDecoration(
                                                         color: getStatusColor(
@@ -406,7 +406,8 @@ class _BookingStatusState extends State<BookingStatus> {
                                                             width: 1)),
                                                     child: Center(
                                                       child: AppText.appText(
-                                                        "${capitalize(booking['status'])}",
+                                                        capitalize(
+                                                            booking['status']),
                                                         fontSize: 20,
                                                         fontWeight:
                                                             FontWeight.w600,

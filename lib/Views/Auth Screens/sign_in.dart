@@ -9,6 +9,7 @@ import 'package:co_work_nastp/config/dio/app_logger.dart';
 import 'package:co_work_nastp/config/dio/dio.dart';
 import 'package:co_work_nastp/config/keys/urls.dart';
 import 'package:dio/dio.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,118 +70,151 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Image(
-            image: AssetImage("assets/images/loginTop.png"),
-            color: AppTheme.appColor,
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 30.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image(
-                            image: AssetImage("assets/images/person.png"),
-                            height: 46,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        body: Column(
+          children: [
+            Image(
+              image: AssetImage("assets/images/loginTop.png"),
+              color: AppTheme.appColor,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 30.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image(
+                              image: AssetImage("assets/images/person.png"),
+                              height: 46,
+                            ),
+                            SizedBox(width: 20),
+                            AppText.appText("LOGIN",
+                                fontSize: 42, fontWeight: FontWeight.w500),
+                          ],
+                        ),
+                      ),
+                      Image(
+                        image: AssetImage("assets/images/loginCenter.png"),
+                        height: 200,
+                      ),
+                      SizedBox(height: 30),
+
+                      CustomAppFormField(
+                        texthint: "Email",
+                        controller: _emailController,
+                      ),
+                      if (emailError != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              emailError!,
+                              style: TextStyle(color: Colors.red, fontSize: 14),
+                            ),
                           ),
-                          SizedBox(width: 20),
-                          AppText.appText("LOGIN",
-                              fontSize: 42, fontWeight: FontWeight.w500),
+                        ),
+
+                      SizedBox(height: 30),
+
+                      /// Password Field with Error
+                      CustomAppPasswordfield(
+                        texthint: "Password",
+                        controller: _passwordController,
+                      ),
+                      if (passwordError != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              passwordError!,
+                              style: TextStyle(color: Colors.red, fontSize: 14),
+                            ),
+                          ),
+                        ),
+
+                      SizedBox(height: 30),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          AppText.appText("Forgot your password?",
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              textColor: Color(0xff323232)),
                         ],
                       ),
-                    ),
-                    Image(
-                      image: AssetImage("assets/images/loginCenter.png"),
-                      height: 200,
-                    ),
-                    SizedBox(height: 30),
 
-                    /// Email Field with Error
-                    CustomAppFormField(
-                      texthint: "Email",
-                      controller: _emailController,
-                    ),
-                    if (emailError != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            emailError!,
-                            style: TextStyle(color: Colors.red, fontSize: 14),
-                          ),
-                        ),
-                      ),
+                      SizedBox(height: 30),
 
-                    SizedBox(height: 30),
-
-                    /// Password Field with Error
-                    CustomAppPasswordfield(
-                      texthint: "Password",
-                      controller: _passwordController,
-                    ),
-                    if (passwordError != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            passwordError!,
-                            style: TextStyle(color: Colors.red, fontSize: 14),
-                          ),
-                        ),
-                      ),
-
-                    SizedBox(height: 30),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        AppText.appText("Forgot your password?",
-                            fontSize: 14, fontWeight: FontWeight.w600),
-                      ],
-                    ),
-
-                    SizedBox(height: 30),
-
-                    isLoading
-                        ? CircularProgressIndicator()
-                        : AppButton.appButton(
-                            "Login",
-                            onTap: validateAndSignIn,
-                            context: context,
-                          ),
-                  ],
+                      isLoading
+                          ? CircularProgressIndicator()
+                          : AppButton.appButton(
+                              "Login",
+                              onTap: validateAndSignIn,
+                              context: context,
+                            ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
+
+//   void handleLogin() async {
+//     String email = _emailController.text;
+//     String password = _passwordController.text;
+
+//     Map<String, dynamic>? response = await apiService.login(email, password);
+
+//     if (response != null) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text("Login Successful")),
+//       );
+//     } else {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text("Login Failed")),
+//       );
+//     }
+//   }
+
+// }
 
   void signIn(context) async {
     setState(() {
       isLoading = true;
     });
-
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        isLoading = false;
+      });
+      ToastHelper.displayErrorMotionToast(
+          context: context, msg: "No internet connection. Please try again.");
+      return;
+    }
     Map<String, dynamic> params = {
       "email": _emailController.text,
       "password": _passwordController.text,
     };
 
     try {
-      Response response = await dio.post(path: "https://api.coworkatnastp.com/api/branch/login", data: params);
+      Response response = await dio.post(path: AppUrls.logIn, data: params);
       var responseData = response.data;
 
       if (response.statusCode == 200) {
@@ -197,14 +231,12 @@ class _SignInScreenState extends State<SignInScreen> {
         var user = finalData["id"];
         var userName = finalData["name"];
         var userType = finalData["type"];
-        var userRole = finalData["type"];
-        print("object$userRole");
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString(PrefKey.authorization, token ?? '');
         prefs.setString(PrefKey.id, user.toString());
         prefs.setString(PrefKey.fullName, userName);
         prefs.setString(PrefKey.userType, userType);
-        prefs.setString(PrefKey.userRole, userRole);
+        // prefs.setString(PrefKey.userRole, userRole);
 
         Navigator.pushAndRemoveUntil(
           context,
@@ -222,12 +254,11 @@ class _SignInScreenState extends State<SignInScreen> {
       if (kDebugMode) {
         print("Something went wrong: $e");
       }
-         ToastHelper.displayErrorMotionToast(
-            context: context, msg: "Something went wrong");
+      ToastHelper.displayErrorMotionToast(
+          context: context, msg: "Something went wrong$e");
       setState(() {
         isLoading = false;
       });
     }
   }
-
 }

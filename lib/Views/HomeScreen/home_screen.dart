@@ -3,6 +3,7 @@ import 'package:co_work_nastp/Helpers/app_theme.dart';
 import 'package:co_work_nastp/Helpers/pref_keys.dart';
 import 'package:co_work_nastp/Helpers/toaster.dart';
 import 'package:co_work_nastp/Helpers/utils.dart';
+import 'package:co_work_nastp/Views/BookingScreen/booking.dart';
 import 'package:co_work_nastp/Views/BookingScreen/booking_status.dart';
 import 'package:co_work_nastp/Views/HomeScreen/home_widgets.dart';
 import 'package:co_work_nastp/Views/HomeScreen/slider.dart';
@@ -28,10 +29,10 @@ class _HomeScreenState extends State<HomeScreen> {
     "assets/images/chat.png",
   ];
   List wrapText = [
-    "Booking Status",
-    "Room Booking",
-    "Subscription",
-    "Billings",
+    "Bookings",
+    "Schedual Meeting Room",
+    "Billing Details",
+    "Notifications",
   ];
 
   String? userName;
@@ -152,8 +153,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             setState(() {
                               index = i;
-                             List screenList= [
-                                BookingStatus(), 
+                              List screenList = [
+                                BookingStatus(),
+                                BookingScreen(
+                                  button: true,
+                                )
                               ];
                               push(context, screenList[i]);
                             });
@@ -165,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 164,
                               decoration: BoxDecoration(
                                 color: index == i
-                                    ? Color.fromARGB(255, 75, 102, 132)
+                                    ? AppTheme.appColor
                                     : AppTheme.white,
                                 borderRadius: BorderRadius.circular(14),
                               ),
@@ -175,9 +179,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   Image.asset(
                                     wrapImg[i],
-                                    height: 50,
+                                    height: 40,
                                     color: index != i
-                                        ? Color.fromARGB(255, 75, 102, 132)
+                                        ? AppTheme.appColor
                                         : AppTheme.white,
                                   ),
                                   AppText.appText(

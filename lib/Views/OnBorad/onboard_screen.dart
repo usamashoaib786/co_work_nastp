@@ -16,7 +16,7 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.appColor,
+      backgroundColor: Color(0xffEFF7FF),
       body: Column(
         children: [
           Padding(
@@ -68,19 +68,13 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
                   AppText.appText(
                     'Find Rooms & Event Near You',
                     fontSize: 17,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w300,
                     textColor: AppTheme.txtColor,
                   ),
                   const SizedBox(height: 50),
                   AppButton.appButton("Get Started", onTap: () {
                     push(context, BottomNavView());
-                  },
-                      height: 60,
-                      backgroundColor: AppTheme.appColor,
-                      radius: 10.0,
-                      textColor: AppTheme.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600, context: context)
+                  }, context: context)
                 ],
               ),
             ),

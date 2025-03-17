@@ -1,9 +1,10 @@
 import 'dart:io';
 
+import 'package:co_work_nastp/Helpers/app_button.dart';
 import 'package:co_work_nastp/Helpers/app_text.dart';
 import 'package:co_work_nastp/Helpers/app_theme.dart';
-import 'package:co_work_nastp/Helpers/custom_appbar.dart';
 import 'package:co_work_nastp/Helpers/pop_up.dart';
+import 'package:co_work_nastp/Helpers/screen_size.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -16,7 +17,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   String? _pickedFilePath;
-
+  bool? isEdit = false;
   pickImage() async {
     final ImagePicker picker = ImagePicker();
 
@@ -31,20 +32,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        txt: "Settings",
+      appBar: AppBar(
+        title: AppText.appText("Profile",
+            fontWeight: FontWeight.w700, fontSize: 26),
+        centerTitle: true,
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'edit') {
+                setState(() {
+                  isEdit = true;
+                });
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: "edit",
+                child: Text("Edit"),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.only(
           left: 20.0,
-          right: 20,
+          right: 20.0,
         ),
         child: SingleChildScrollView(
           child: Column(
             children: [
               SizedBox(
-                  height: 120,
-                  width: 120,
+                height: 20,
+              ),
+              SizedBox(
+                  height: 140,
+                  width: 140,
                   child: Stack(
                     children: [
                       Card(
@@ -77,48 +100,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       size: 30,
                                     ))),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          pickImage();
-                        },
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100)),
-                            child: Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppTheme.white),
-                              child: Icon(Icons.camera_alt),
+                      if (isEdit == true)
+                        GestureDetector(
+                          onTap: () {
+                            pickImage();
+                          },
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(100)),
+                              child: Container(
+                                height: 40,
+                                width: 40,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppTheme.white),
+                                child: Icon(Icons.camera_alt),
+                              ),
                             ),
                           ),
                         ),
-                      ),
                     ],
                   )),
               Padding(
-                padding: const EdgeInsets.only(top: 10.0, bottom: 5),
+                padding: const EdgeInsets.only(top: 10.0, bottom: 20),
                 child: AppText.appText("USAMA SHOAIB",
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     textColor: AppTheme.appColor),
               ),
-              AppText.appText("usamashoaib313@gmail.com",
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  textColor: AppTheme.txtColor),
-              SizedBox(
-                height: 20,
-              ),
-              customColumn(txt: "Account Details"),
-              customColumn(txt: "Payment Method"),
-              customColumn(txt: "Payment History"),
-              customColumn(txt: "Privacy"),
-              customColumn(
-                txt: "Logout",
+              _buildProfileOption(Icons.email, "Talhamasnsha@gmail.com",
+                  "assets/images/email.png"),
+              _buildProfileOption(
+                  Icons.phone, "0320-9469594", "assets/images/phone.png"),
+              _buildProfileOption(
+                  Icons.location_on, "Lahore", "assets/images/loc.png"),
+              _buildProfileOption(
+                  Icons.settings, "Settings", "assets/images/settings.png"),
+              _buildProfileOption(Icons.help, "Help", "assets/images/help.png"),
+              _buildProfileOption(
+                Icons.logout,
+                "Logout",
+                "assets/images/logOut.png",
                 onTap: () {
                   showDialog(
                     context: context,
@@ -128,6 +152,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   );
                 },
               ),
+              SizedBox(
+                height: 30,
+              ),
+              if (isEdit == true)
+                Column(
+                  children: [
+                    AppButton.appButton("Update", context: context, width: 261),
+                    SizedBox(
+                      height: 30,
+                    )
+                  ],
+                ),
             ],
           ),
         ),
@@ -135,30 +171,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  customColumn({txt, Function()? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 20.0),
-        child: Card(
-          elevation: 5,
-          child: SizedBox(
-            height: 50,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AppText.appText("$txt",
-                      fontSize: 18, fontWeight: FontWeight.w700),
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: AppTheme.appColor,
-                  )
-                ],
-              ),
+  Widget _buildProfileOption(IconData icon, String text, String img,
+      {Function()? onTap}) {
+    return SizedBox(
+      height: 65,
+      width: ScreenSize(context).width,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Row(
+          children: [
+            Container(
+                height: 45,
+                width: 45,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle, color: Color(0xffE4E4E4)),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Image.asset(
+                    img,
+                    height: 22,
+                  ),
+                )),
+            SizedBox(
+              width: 15,
             ),
-          ),
+            AppText.appText(text, fontSize: 18, fontWeight: FontWeight.w600)
+          ],
         ),
       ),
     );

@@ -14,7 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class BookingScreen extends StatefulWidget {
-  const BookingScreen({super.key});
+  final bool? button;
+  const BookingScreen({super.key, this.button});
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -90,7 +91,7 @@ class _BookingScreenState extends State<BookingScreen> {
         appBar: CustomAppBar(
           txt: "Meeting Room Booking",
           color: AppTheme.appColor,
-          leadIcon: false,
+          leadIcon: widget.button == true ? true : false,
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -98,6 +99,7 @@ class _BookingScreenState extends State<BookingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: 15),
                 AppText.appText(
                   'Select Location',
                   fontWeight: FontWeight.w400,
@@ -191,8 +193,8 @@ class _BookingScreenState extends State<BookingScreen> {
                         ),
                       ),
                       viewHeaderStyle: ViewHeaderStyle(
-                        backgroundColor: AppTheme.appColor
-                            .withValues(alpha: 0.1), // Light background for weekdays
+                        backgroundColor: AppTheme.appColor.withValues(
+                            alpha: 0.1), // Light background for weekdays
                         dayTextStyle: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
