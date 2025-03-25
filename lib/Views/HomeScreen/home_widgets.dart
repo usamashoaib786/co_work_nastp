@@ -38,7 +38,7 @@ class Homewidgets {
                   height: 10,
                 ),
                 AppText.appText("$txt1",
-                    fontSize: 9, fontWeight: FontWeight.w400),
+                    fontSize: 9, fontWeight: FontWeight.w600),
                 AppText.appText("$counts",
                     fontSize: 30, fontWeight: FontWeight.w800),
                 AppText.appText("$txt2",
@@ -60,7 +60,7 @@ class Homewidgets {
     );
   }
 
-  /////////////////////////////////////////
+  ///////////////////////////////////////// 
   static homeAppBar({name}) {
     return Padding(
       padding:

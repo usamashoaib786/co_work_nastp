@@ -39,83 +39,81 @@ class _CalenderViewState extends State<CalenderView> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Calendar View", style: TextStyle(color: Colors.white)),
-          backgroundColor: AppTheme.appColor,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Calendar View", style: TextStyle(color: Colors.white, fontFamily: "Montserrat")),
+        backgroundColor: AppTheme.appColor,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: AppTheme.appColor,
-          onPressed: () => _showEventBottomSheet(),
-          child: Icon(Icons.add, color: Colors.white),
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SfCalendar(
-                key:
-                    ValueKey(selectedDate), // Ensures widget rebuilds correctly
-                view: CalendarView.day,
-                headerHeight: 60,
-                showDatePickerButton: true,
-                initialDisplayDate: selectedDate,
-                dataSource: MeetingDataSource(
-                    List.from(meetings)), // Avoid reference issues
-                timeSlotViewSettings: TimeSlotViewSettings(
-                  timeIntervalHeight: 60,
-                  timeRulerSize: 65,
-                  timeTextStyle: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
-                  ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppTheme.appColor,
+        onPressed: () => _showEventBottomSheet(),
+        child: Icon(Icons.add, color: Colors.white),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SfCalendar(
+              key:
+                  ValueKey(selectedDate), // Ensures widget rebuilds correctly
+              view: CalendarView.day,
+              headerHeight: 60,
+              showDatePickerButton: true,
+              initialDisplayDate: selectedDate,
+              dataSource: MeetingDataSource(
+                  List.from(meetings)), // Avoid reference issues
+              timeSlotViewSettings: TimeSlotViewSettings(
+                timeIntervalHeight: 60,
+                timeRulerSize: 65,
+                timeTextStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87,
                 ),
-                headerStyle: CalendarHeaderStyle(
-                  backgroundColor: AppTheme.appColor,
-                  textStyle: TextStyle(color: AppTheme.white),
-                ),
-                selectionDecoration: BoxDecoration(
-                  color: AppTheme.appColor.withValues(alpha: 0.1),
-                  border: Border.all(color: AppTheme.appColor, width: 2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                onTap: (CalendarTapDetails details) {
-                  if (details.targetElement == CalendarElement.appointment) {
-                    Meeting meeting = details.appointments!.first;
-                    showEventDetailsDialog(meeting, context);
-                  } else if (details.targetElement ==
-                      CalendarElement.calendarCell) {
-                    DateTime selectedStartTime = details.date ?? DateTime.now();
-                    DateTime selectedEndTime = selectedStartTime
-                        .add(Duration(minutes: 60)); // Default duration
-                    _showEventBottomSheet(
-                      startTime: selectedStartTime,
-                      endTime: selectedEndTime,
-                    );
-                  }
-                },
-
-                onViewChanged: (ViewChangedDetails details) {
-                  if (details.visibleDates.isNotEmpty) {
-                    DateTime newDate =
-                        details.visibleDates.first; // Get first visible date
-                    if (selectedDate != newDate) {
-                      setState(() {
-                        selectedDate = newDate;
-                      });
-                      getBookings(date: selectedDate, context: context);
-                    }
-                  }
-                },
               ),
+              headerStyle: CalendarHeaderStyle(
+                backgroundColor: AppTheme.appColor,
+                textStyle: TextStyle(color: AppTheme.white),
+              ),
+              selectionDecoration: BoxDecoration(
+                color: AppTheme.appColor.withValues(alpha: 0.1),
+                border: Border.all(color: AppTheme.appColor, width: 2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              onTap: (CalendarTapDetails details) {
+                if (details.targetElement == CalendarElement.appointment) {
+                  Meeting meeting = details.appointments!.first;
+                  showEventDetailsDialog(meeting, context);
+                } else if (details.targetElement ==
+                    CalendarElement.calendarCell) {
+                  DateTime selectedStartTime = details.date ?? DateTime.now();
+                  DateTime selectedEndTime = selectedStartTime
+                      .add(Duration(minutes: 60)); // Default duration
+                  _showEventBottomSheet(
+                    startTime: selectedStartTime,
+                    endTime: selectedEndTime,
+                  );
+                }
+              },
+    
+              onViewChanged: (ViewChangedDetails details) {
+                if (details.visibleDates.isNotEmpty) {
+                  DateTime newDate =
+                      details.visibleDates.first; // Get first visible date
+                  if (selectedDate != newDate) {
+                    setState(() {
+                      selectedDate = newDate;
+                    });
+                    getBookings(date: selectedDate, context: context);
+                  }
+                }
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -170,7 +168,6 @@ class _CalenderViewState extends State<CalenderView> {
         // ✅ Convert UTC to Pakistan Standard Time (UTC+5)
         DateTime pakStartTime = utcStartTime.toLocal();
         DateTime pakEndTime = utcEndTime.toLocal();
-        print("object$pakEndTime");
         return Meeting(
           schedule['title'] ?? "Untitled Event",
           pakStartTime,

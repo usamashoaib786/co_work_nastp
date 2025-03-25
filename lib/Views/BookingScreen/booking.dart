@@ -2,9 +2,11 @@
 import 'package:co_work_nastp/Helpers/app_text.dart';
 import 'package:co_work_nastp/Helpers/app_theme.dart';
 import 'package:co_work_nastp/Helpers/custom_appbar.dart';
+import 'package:co_work_nastp/Helpers/screen_size.dart';
 import 'package:co_work_nastp/Helpers/toaster.dart';
 import 'package:co_work_nastp/Helpers/utils.dart';
 import 'package:co_work_nastp/Views/BookingScreen/sf.dart';
+import 'package:co_work_nastp/Views/Bottom%20Navigation%20bar/bottom_nav_view.dart';
 import 'package:co_work_nastp/config/dio/app_logger.dart';
 import 'package:co_work_nastp/config/dio/dio.dart';
 import 'package:co_work_nastp/config/keys/urls.dart';
@@ -90,8 +92,11 @@ class _BookingScreenState extends State<BookingScreen> {
       child: Scaffold(
         appBar: CustomAppBar(
           txt: "Meeting Room Booking",
-          color: AppTheme.appColor,
-          leadIcon: widget.button == true ? true : false,
+          color: AppTheme.black,
+          leadIcon: true,
+          onTap: () {
+            pushUntil(context, BottomNavView());
+          },
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -99,77 +104,100 @@ class _BookingScreenState extends State<BookingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 15),
-                AppText.appText(
-                  'Select Location',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 20,
-                ),
-                SizedBox(height: 15),
-                DropdownButtonFormField<String>(
-                    hint: Text("Choose a Location"),
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        borderSide: BorderSide(color: AppTheme.borderCOlor),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        borderSide: BorderSide(color: AppTheme.borderCOlor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        borderSide: BorderSide(color: AppTheme.borderCOlor),
-                      ),
+                Center(
+                  child: SizedBox(
+                    width: ScreenSize(context).width * 0.8,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 15),
+                        AppText.appText(
+                          'Select Location',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 20,
+                        ),
+                        SizedBox(height: 15),
+                        DropdownButtonFormField<String>(
+                            dropdownColor: AppTheme.white,
+                            hint: AppText.appText("Choose a Location"),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide:
+                                    BorderSide(color: AppTheme.borderCOlor),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide:
+                                    BorderSide(color: AppTheme.borderCOlor),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide:
+                                    BorderSide(color: AppTheme.borderCOlor),
+                              ),
+                            ),
+                            items: locationData
+                                .map((location) => DropdownMenuItem(
+                                      value:
+                                          location["id"].toString(), // Store ID
+                                      child: Text(location["name"]),
+                                    ))
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedLocationId =
+                                    value; // Save selected location ID
+                                getRoom(context, selectedLocationId);
+                              });
+                            }),
+                        SizedBox(height: 20),
+                        AppText.appText(
+                          'Select Room',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 20,
+                        ),
+                        SizedBox(height: 15),
+                        DropdownButtonFormField<String>(
+                            hint: AppText.appText("Choose a room"),
+                            dropdownColor: AppTheme.white,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide:
+                                    BorderSide(color: AppTheme.borderCOlor),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide:
+                                    BorderSide(color: AppTheme.borderCOlor),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide:
+                                    BorderSide(color: AppTheme.borderCOlor),
+                              ),
+                            ),
+                            items: roomData
+                                .map((room) => DropdownMenuItem(
+                                      value: room["id"].toString(), // Store ID
+                                      child: Text(room["name"]),
+                                    ))
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedRoomId =
+                                    value; // Save selected location ID
+                              });
+                            }),
+                        SizedBox(height: 20),
+                      ],
                     ),
-                    items: locationData
-                        .map((location) => DropdownMenuItem(
-                              value: location["id"].toString(), // Store ID
-                              child: Text(location["name"]),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedLocationId = value; // Save selected location ID
-                        getRoom(context, selectedLocationId);
-                      });
-                    }),
-                SizedBox(height: 20),
-                AppText.appText(
-                  'Select Room',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 20,
+                  ),
                 ),
-                SizedBox(height: 15),
-                DropdownButtonFormField<String>(
-                    hint: Text("Choose a room"),
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        borderSide: BorderSide(color: AppTheme.borderCOlor),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        borderSide: BorderSide(color: AppTheme.borderCOlor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        borderSide: BorderSide(color: AppTheme.borderCOlor),
-                      ),
-                    ),
-                    items: roomData
-                        .map((room) => DropdownMenuItem(
-                              value: room["id"].toString(), // Store ID
-                              child: Text(room["name"]),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedRoomId = value; // Save selected location ID
-                      });
-                    }),
-                SizedBox(height: 20),
                 Card(
+                  elevation: 5,
+                  color: AppTheme.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                   child: ClipRRect(

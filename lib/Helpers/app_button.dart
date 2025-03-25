@@ -1,4 +1,3 @@
-
 import 'package:co_work_nastp/Helpers/app_text.dart';
 import 'package:co_work_nastp/Helpers/app_theme.dart';
 import 'package:co_work_nastp/Helpers/screen_size.dart';
@@ -23,7 +22,6 @@ class AppButton {
       var radius,
       double? letterSpacing,
       bool underLine = false,
-      bool fontFamily = false,
       bool? border,
       bool? blurContainer}) {
     return InkWell(
@@ -41,11 +39,10 @@ class AppButton {
                 : Border.all(
                     color: borderColor ?? AppTheme.appColor, width: 1)),
         child: AppText.appText(text,
-            fontFamily: fontFamily,
-            fontSize: fontSize?? 20,
+            fontSize: fontSize ?? 20,
             textAlign: textAlign,
-            fontWeight: fontWeight??FontWeight.w600,
-            textColor: textColor?? AppTheme.white,
+            fontWeight: fontWeight ?? FontWeight.w600,
+            textColor: textColor ?? AppTheme.white,
             overflow: overflow,
             letterSpacing: letterSpacing,
             textBaseline: textBaseline,

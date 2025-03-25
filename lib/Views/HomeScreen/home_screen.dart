@@ -205,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         AppText.appText("Available Rooms",
-                            fontSize: 16, fontWeight: FontWeight.w500),
+                            fontSize: 16, fontWeight: FontWeight.w700),
                       ],
                     ),
                   ),

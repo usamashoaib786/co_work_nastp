@@ -324,7 +324,7 @@ class _AddEventBottomSheetState extends State<AddEventBottomSheet> {
           Positioned.fill(
             child: Container(
               color:
-                  Colors.black.withOpacity(0.5), // Semi-transparent background
+                  Colors.black.withAlpha(5), // Semi-transparent background
               child: Center(
                 child: CircularProgressIndicator(
                     color: AppTheme.appColor), // Loader in the center

@@ -4,6 +4,7 @@ import 'package:co_work_nastp/Helpers/app_text.dart';
 import 'package:co_work_nastp/Helpers/app_theme.dart';
 import 'package:co_work_nastp/Helpers/custom_appbar.dart';
 import 'package:co_work_nastp/Helpers/screen_size.dart';
+import 'package:co_work_nastp/Helpers/toaster.dart';
 import 'package:co_work_nastp/config/dio/app_logger.dart';
 import 'package:co_work_nastp/config/dio/dio.dart';
 import 'package:co_work_nastp/config/keys/urls.dart';
@@ -37,13 +38,10 @@ class _BookingStatusState extends State<BookingStatus> {
   }
 
   void filterBookingsByDateRange() {
-    print("object$fromDate ... jbeb$toDate");
     if (fromDate == null || toDate == null) return;
 
     setState(() {
-      print("fi2ifn$filteredBookings");
       filteredBookings = _bookings.where((booking) {
-        print("mlsmlmlmsl${booking['date']}");
         DateTime bookingDate = DateTime.parse(booking['date']);
         return bookingDate.isAfter(fromDate!.subtract(Duration(days: 1))) &&
             bookingDate.isBefore(toDate!.add(Duration(days: 1)));
@@ -62,7 +60,6 @@ class _BookingStatusState extends State<BookingStatus> {
         _bookings =
             schedules.map((schedule) => _mapSchedule(schedule)).toList();
         filteredBookings = List.from(_bookings); // Copy data for filtering
-        print("Fitlered Bookings.......!$filteredBookings");
         _isLoading = false;
         _hasError = false;
       });
@@ -109,6 +106,7 @@ class _BookingStatusState extends State<BookingStatus> {
       "endTime": formatTime(schedule['endTime']),
       "status": schedule['status'] ?? 'N/A',
       "title": schedule['title'],
+      "event_id": schedule['event_id'],
     };
   }
 
@@ -116,10 +114,10 @@ class _BookingStatusState extends State<BookingStatus> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        txt: "Booking",
+        txt: "Bookings",
         leadIcon: true,
         buttonColor: AppTheme.appColor,
-        color: AppTheme.appColor,
+        color: AppTheme.black,
         cicleColor: AppTheme.white,
       ),
       body: Padding(
@@ -131,13 +129,14 @@ class _BookingStatusState extends State<BookingStatus> {
               children: [
                 CustomAppFormField(
                   texthint: "Search...",
+                  border: false,
                   prefixIcon: Icon(
                     Icons.search,
                     size: 30,
                   ),
                   controller: _controller,
                   width: ScreenSize(context).width * 0.7,
-                  bgcolor: Color(0xffF4F4F4),
+                  bgcolor: const Color(0xffF4F4F4),
                   onChanged: (value) {
                     searchBookings(value);
                   },
@@ -150,15 +149,18 @@ class _BookingStatusState extends State<BookingStatus> {
                     height: 60,
                     width: ScreenSize(context).width * 0.20,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Color(0xffF4F4F4),
-                        border: Border.all(color: AppTheme.black)),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Color(0xffF4F4F4),
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Image.asset("assets/images/filter.png", height: 15),
-                        AppText.appText("Filter",
-                            fontSize: 14, fontWeight: FontWeight.w500),
+                        AppText.appText(
+                          "Filter",
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ],
                     ),
                   ),
@@ -207,92 +209,7 @@ class _BookingStatusState extends State<BookingStatus> {
                           itemCount: filteredBookings.length,
                           itemBuilder: (context, index) {
                             final booking = filteredBookings[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                elevation: 5,
-                                child: Container(
-                                  height: 320,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 0.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          height: 52,
-                                          decoration: BoxDecoration(
-                                              color: AppTheme.appColor,
-                                              borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(20),
-                                                topRight: Radius.circular(20),
-                                              )),
-                                          child: Center(
-                                            child: AppText.appText(
-                                                "${booking['title']}",
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                textColor: AppTheme.white),
-                                          ),
-                                        ),
-                                        customRow(
-                                            txt1: "Date:",
-                                            txt2: "${booking['date']}",
-                                            txt3: "Time:",
-                                            txt4:
-                                                " ${booking['startTime']} - ${booking['endTime']}",
-                                            img1: "assets/images/room.png",
-                                            img2: "assets/images/room.png"),
-                                        customRow(
-                                            txt1: "Room:",
-                                            txt2: "${booking['room']}",
-                                            img1: "assets/images/room.png",
-                                            txt3: "Floor:",
-                                            txt4: "${booking['floor']}",
-                                            img2: "assets/images/floor.png"),
-                                        Container(
-                                          height: 1,
-                                          width: ScreenSize(context).width,
-                                          color: Color(0xffD8D8D8),
-                                        ),
-                                        Center(
-                                          child: Container(
-                                            width: 130,
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                                color: getStatusColor(
-                                                    booking['status']),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                border: Border.all(
-                                                    color: AppTheme.appColor,
-                                                    width: 1)),
-                                            child: Center(
-                                              child: AppText.appText(
-                                                "${capitalize(booking['status'])}",
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                                textColor: AppTheme.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox.shrink()
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
+                            return builder(booking: booking);
                           },
                         ),
                       )
@@ -319,111 +236,7 @@ class _BookingStatusState extends State<BookingStatus> {
                                   itemCount: _bookings.length,
                                   itemBuilder: (context, index) {
                                     final booking = _bookings[index];
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 8.0),
-                                      child: Card(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        elevation: 5,
-                                        child: Container(
-                                          height: 320,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 0.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Container(
-                                                  height: 52,
-                                                  decoration: BoxDecoration(
-                                                      color: AppTheme.appColor,
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                        topLeft:
-                                                            Radius.circular(20),
-                                                        topRight:
-                                                            Radius.circular(20),
-                                                      )),
-                                                  child: Center(
-                                                    child: AppText.appText(
-                                                        "${booking['title']}",
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        textColor:
-                                                            AppTheme.white),
-                                                  ),
-                                                ),
-                                                customRow(
-                                                    txt1: "Date:",
-                                                    txt2: "${booking['date']}",
-                                                    txt3: "Time:",
-                                                    txt4:
-                                                        " ${booking['startTime']} - ${booking['endTime']}",
-                                                    img1:
-                                                        "assets/images/calendar.png",
-                                                    img2:
-                                                        "assets/images/clock.png"),
-                                                customRow(
-                                                    txt1: "Room:",
-                                                    txt2: "${booking['room']}",
-                                                    img1:
-                                                        "assets/images/room.png",
-                                                    txt3: "Floor:",
-                                                    txt4: "${booking['floor']}",
-                                                    img2:
-                                                        "assets/images/floor.png"),
-                                                Container(
-                                                  height: 1,
-                                                  width:
-                                                      ScreenSize(context).width,
-                                                  color: Color(0xffD8D8D8),
-                                                ),
-                                                Center(
-                                                  child: Container(
-                                                    width: 130,
-                                                    height: 50,
-                                                    decoration: BoxDecoration(
-                                                        color: getStatusColor(
-                                                            booking['status']),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        border: Border.all(
-                                                            color: AppTheme
-                                                                .appColor,
-                                                            width: 1)),
-                                                    child: Center(
-                                                      child: AppText.appText(
-                                                        capitalize(
-                                                            booking['status']),
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        textColor:
-                                                            AppTheme.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox.shrink()
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
+                                    return builder(booking: booking);
                                   },
                                 ),
                               ),
@@ -534,7 +347,7 @@ class _BookingStatusState extends State<BookingStatus> {
   Color getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
-        return const Color.fromARGB(255, 197, 151, 82);
+        return const Color.fromARGB(255, 192, 191, 187)   ;
       case 'approved':
         return AppTheme.appColor;
       case 'cancelled':
@@ -546,7 +359,7 @@ class _BookingStatusState extends State<BookingStatus> {
 
   Widget customRow({txt1, txt2, txt3, txt4, img1, img2}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -560,26 +373,31 @@ class _BookingStatusState extends State<BookingStatus> {
                     height: 36,
                     width: 36,
                     decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color.fromARGB(137, 207, 202, 202)),
+                        shape: BoxShape.circle, color: const Color(0xffF4F4F4)),
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Image(image: AssetImage("$img1")),
                     )),
+                SizedBox(
+                  height: 10,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AppText.appText("$txt1",
-                        fontSize: 13,
-                        textColor: Colors.black,
+                        fontSize: 12,
+                        textColor: Color(0xff757575),
                         fontWeight: FontWeight.w500),
+                    SizedBox(
+                      width: 5,
+                    ),
                     Flexible(
                       child: AppText.appText(
                         "$txt2",
-                        fontSize: 15,
+                        fontSize: 12,
                         textColor: Colors.black,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         softWrap: true,
                       ),
                     ),
@@ -596,26 +414,31 @@ class _BookingStatusState extends State<BookingStatus> {
                     height: 36,
                     width: 36,
                     decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color.fromARGB(137, 207, 202, 202)),
+                        shape: BoxShape.circle, color: const Color(0xffF4F4F4)),
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Image(image: AssetImage("$img2")),
                     )),
+                SizedBox(
+                  height: 10,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AppText.appText("$txt3",
-                        fontSize: 13,
-                        textColor: Colors.black,
+                        fontSize: 12,
+                        textColor: Color(0xff757575),
                         fontWeight: FontWeight.w500),
+                    SizedBox(
+                      width: 5,
+                    ),
                     Flexible(
                       child: AppText.appText(
                         "$txt4",
-                        fontSize: 15,
+                        fontSize: 12,
                         textColor: Colors.black,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         softWrap: true,
                       ),
                     ),
@@ -627,5 +450,199 @@ class _BookingStatusState extends State<BookingStatus> {
         ],
       ),
     );
+  }
+
+  Widget builder({booking}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Card(
+        color: AppTheme.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        elevation: 5,
+        child: Container(
+          height: 330,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                height: 52,
+                decoration: BoxDecoration(
+                    color: AppTheme.appColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    )),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: 1,
+                        height: 1,
+                      ),
+                      AppText.appText(capitalize(booking['title']),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          textColor: AppTheme.white),
+                      PopupMenuButton<String>(
+                        color: AppTheme.white,
+                        padding: EdgeInsets.all(0),
+                        iconColor: AppTheme.white,
+                        onSelected: (value) {
+                          if (value == 'Delete') {
+                            showCancelBookingDialog(context,
+                                id: booking["event_id"]);
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: "Delete",
+                            child: Text("Delete"),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              customRow(
+                  txt1: "Date:",
+                  txt2: "${booking['date']}",
+                  txt3: "Time:",
+                  txt4: " ${booking['startTime']} - ${booking['endTime']}",
+                  img1: "assets/images/calendar.png",
+                  img2: "assets/images/clock.png"),
+              customRow(
+                  txt1: "Room:",
+                  txt2: "${booking['room']}",
+                  img1: "assets/images/room.png",
+                  txt3: "Floor:",
+                  txt4: "${booking['floor']}",
+                  img2: "assets/images/floor.png"),
+              Container(
+                height: 1,
+                width: ScreenSize(context).width,
+                color: Color(0xffD8D8D8),
+              ),
+              Center(
+                child: Container(
+                  width: 130,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: getStatusColor(booking['status']),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Center(
+                    child: AppText.appText(
+                      capitalize(booking['status']),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      textColor: AppTheme.white,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox.shrink()
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showCancelBookingDialog(BuildContext context, {id}) {
+    print("object$id");
+    showDialog(
+      context: context,
+      barrierDismissible: true, // Prevent closing by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10), // Rounded corners
+          ),
+          contentPadding: EdgeInsets.all(20), // Spacing inside the dialog
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Are you sure you want to cancel this booking?",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // No, Keep Booking Button
+                  Expanded(
+                    child: AppButton.appButton(onTap: () {
+                      Navigator.pop(context);
+                    },
+                        context: context,
+                        "No",
+                        fontSize: 14,
+                        width: ScreenSize(context).width * 0.2,
+                        height: 40,
+                        backgroundColor: Colors.transparent,
+                        border: true,
+                        textColor: AppTheme.appColor,
+                        fontWeight: FontWeight.w500),
+                  ),
+
+                  SizedBox(width: 10),
+                  // Yes, Cancel Button
+                  Expanded(
+                    child: AppButton.appButton(onTap: () {
+                      Navigator.pop(context);
+                      delBooking(id: id);
+                    },
+                        context: context,
+                        "Yes",
+                        fontSize: 14,
+                        width: ScreenSize(context).width * 0.2,
+                        height: 40,
+                        backgroundColor: Colors.red,
+                        border: false,
+                        borderColor: Colors.transparent,
+                        textColor: AppTheme.white,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void delBooking({id}) async {
+    setState(() => _isLoading = true);
+    try {
+      final response = await dio.delete(
+          path: "https://api.coworkatnastp.com/api/booking-schedule/$id");
+      if (response.statusCode == 200) {
+        ToastHelper.displaySuccessMotionToast(
+            context: context, msg: "Deleted successfully!");
+        setState(() {
+          fetchBookings();
+          _isLoading = false;
+          _hasError = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+      });
+    }
   }
 }

@@ -8,5 +8,7 @@ class AppUrls {
   static const String getBookings= "booking-schedule/filter";
   static const String createBooking= "booking-schedule/create";
   static const String bookingStatus= "booking-schedule/requests";
+  static const String getProfile= "user/profile";
+  static const String updateProfile= "user/profile/update";
 }
   

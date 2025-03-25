@@ -176,25 +176,6 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-//   void handleLogin() async {
-//     String email = _emailController.text;
-//     String password = _passwordController.text;
-
-//     Map<String, dynamic>? response = await apiService.login(email, password);
-
-//     if (response != null) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text("Login Successful")),
-//       );
-//     } else {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text("Login Failed")),
-//       );
-//     }
-//   }
-
-// }
-
   void signIn(context) async {
     setState(() {
       isLoading = true;
@@ -230,12 +211,18 @@ class _SignInScreenState extends State<SignInScreen> {
         var token = finalData["token"];
         var user = finalData["id"];
         var userName = finalData["name"];
+        var userMail = finalData["email"];
+        var userNumber = finalData["phone_no"];
+        var userPic = finalData["profile_image"];
         var userType = finalData["type"];
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString(PrefKey.authorization, token ?? '');
         prefs.setString(PrefKey.id, user.toString());
-        prefs.setString(PrefKey.fullName, userName);
-        prefs.setString(PrefKey.userType, userType);
+        prefs.setString(PrefKey.fullName, userName ?? "");
+        prefs.setString(PrefKey.email, userMail ?? "");
+        prefs.setString(PrefKey.phone, userNumber ?? "");
+        prefs.setString(PrefKey.profilePic, userPic ?? "");
+        prefs.setString(PrefKey.userType, userType ?? "");
         // prefs.setString(PrefKey.userRole, userRole);
 
         Navigator.pushAndRemoveUntil(

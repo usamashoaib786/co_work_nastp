@@ -21,55 +21,68 @@ class _BottomNavViewState extends State<BottomNavView> {
     const ProfileScreen(),
   ];
   int _currentIndex = 0;
+  Future<bool> _onWillPop() async {
+    if (_currentIndex != 0) {
+      setState(() {
+        _currentIndex = 0;
+      });
+      return false;
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: CurvedNavigationBar(
-        height: 75,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        bottomNavigationBar: CurvedNavigationBar(
+          height: 75,
 
-        animationCurve: Curves.easeOut,
-        animationDuration: Duration(milliseconds: 400),
-        color: AppTheme.appColor, // Semi-transparent background
-        backgroundColor: Colors.transparent,
-        index: _currentIndex,
-        items: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 5.0),
-            child: Image.asset(
-              "assets/images/home.png",
+          animationCurve: Curves.easeOut,
+          animationDuration: Duration(milliseconds: 400),
+          color: AppTheme.appColor, // Semi-transparent background
+          backgroundColor: Colors.transparent,
+          index: _currentIndex,
+          items: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5.0),
+              child: Image.asset(
+                "assets/images/home.png",
+                color: AppTheme.white,
+                height: 24,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 3.0),
+              child: Image.asset(
+                "assets/images/booking.png",
+                color: AppTheme.white,
+                height: 24,
+              ),
+            ),
+            Image.asset(
+              "assets/images/message.png",
               color: AppTheme.white,
               height: 24,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 3.0),
-            child: Image.asset(
-              "assets/images/booking.png",
-              color: AppTheme.white,
-              height: 24,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 3.0),
+              child: Image.asset(
+                "assets/images/profile.png",
+                color: AppTheme.white,
+                height: 24,
+              ),
             ),
-          ),
-          Image.asset(
-            "assets/images/message.png",
-            color: AppTheme.white,
-            height: 24,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 3.0),
-            child: Image.asset(
-              "assets/images/profile.png",
-              color: AppTheme.white,
-              height: 24,
-            ),
-          ),
-        ],
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+          ],
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+        ),
+        body: _screens[_currentIndex],
       ),
-      body: _screens[_currentIndex],
     );
   }
 }

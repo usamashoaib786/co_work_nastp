@@ -1,12 +1,22 @@
 import 'dart:io';
-
 import 'package:co_work_nastp/Helpers/app_button.dart';
+import 'package:co_work_nastp/Helpers/app_field.dart';
 import 'package:co_work_nastp/Helpers/app_text.dart';
 import 'package:co_work_nastp/Helpers/app_theme.dart';
+import 'package:co_work_nastp/Helpers/custom_appbar.dart';
 import 'package:co_work_nastp/Helpers/pop_up.dart';
+import 'package:co_work_nastp/Helpers/pref_keys.dart';
 import 'package:co_work_nastp/Helpers/screen_size.dart';
+import 'package:co_work_nastp/Helpers/toaster.dart';
+import 'package:co_work_nastp/Helpers/utils.dart';
+import 'package:co_work_nastp/Views/Bottom%20Navigation%20bar/bottom_nav_view.dart';
+import 'package:co_work_nastp/config/dio/app_logger.dart';
+import 'package:co_work_nastp/config/dio/dio.dart';
+import 'package:co_work_nastp/config/keys/urls.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,44 +26,74 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String? _pickedFilePath;
+  String? pickedFilePath;
   bool? isEdit = false;
+  String? userName;
+  String? userEmail;
+  String? userPhoneNum;
+  String? userPic;
+  final TextEditingController _lableController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPassController = TextEditingController();
   pickImage() async {
     final ImagePicker picker = ImagePicker();
 
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       setState(() {
-        _pickedFilePath = image.path;
+        pickedFilePath = image.path;
       });
     }
+  }
+
+  bool isLoading = false;
+  late AppDio dio;
+  AppLogger logger = AppLogger();
+  @override
+  void initState() {
+    dio = AppDio(context);
+    logger.init();
+    getLocalProfile();
+    super.initState();
+  }
+
+  getLocalProfile() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      userName = pref.getString(PrefKey.fullName);
+      userEmail = pref.getString(PrefKey.email);
+      userPhoneNum = pref.getString(PrefKey.phone);
+      userPic = pref.getString(PrefKey.profilePic);
+      _lableController.text = userName!;
+      _phoneController.text = userPhoneNum!;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: AppText.appText("Profile",
-            fontWeight: FontWeight.w700, fontSize: 26),
-        centerTitle: true,
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'edit') {
-                setState(() {
-                  isEdit = true;
-                });
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: "edit",
-                child: Text("Edit"),
-              ),
-            ],
-          ),
-        ],
-      ),
+      appBar:
+          CustomAppBar(txt: "Profile", leadIcon: true, onTap: () {
+          pushUntil(context, BottomNavView());
+          }, action: [
+        PopupMenuButton<String>(
+          color: AppTheme.white,
+          onSelected: (value) {
+            if (value == 'edit') {
+              setState(() {
+                isEdit = true;
+              });
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: "edit",
+              child: Text("Edit"),
+            ),
+          ],
+        ),
+      ]),
       body: Padding(
         padding: const EdgeInsets.only(
           left: 20.0,
@@ -73,8 +113,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Card(
                         elevation: 5,
                         shape: RoundedRectangleBorder(
-                            side:
-                                BorderSide(width: 2, color: AppTheme.appColor),
+                            side: BorderSide(
+                                width: 2, color: AppTheme.appColor),
                             borderRadius: BorderRadius.circular(100)),
                         child: Container(
                             height: 120,
@@ -82,23 +122,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             decoration: BoxDecoration(
                                 color: AppTheme.appColor,
                                 shape: BoxShape.circle),
-                            child: _pickedFilePath != null
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(100),
-                                    child: Image.file(
-                                      File(_pickedFilePath!),
-                                      width: 200,
-                                      height: 200,
-                                      fit: BoxFit.fill,
-                                    ),
+                            child: userPic != null
+                                ? Image.network(
+                                    userPic!,
+                                    width: 120,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) {
+                                      return Icon(Icons.person,
+                                          size: 50, color: AppTheme.white);
+                                    },
                                   )
-                                : Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Icon(
-                                      Icons.person,
-                                      color: AppTheme.white,
-                                      size: 30,
-                                    ))),
+                                : pickedFilePath != null
+                                    ? ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        child: Image.file(
+                                          File(pickedFilePath!),
+                                          width: 200,
+                                          height: 200,
+                                          fit: BoxFit.fill,
+                                        ),
+                                      )
+                                    : Padding(
+                                        padding: const EdgeInsets.all(20.0),
+                                        child: Icon(
+                                          Icons.person,
+                                          color: AppTheme.white,
+                                          size: 30,
+                                        ))),
                       ),
                       if (isEdit == true)
                         GestureDetector(
@@ -124,41 +177,80 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   )),
               Padding(
-                padding: const EdgeInsets.only(top: 10.0, bottom: 20),
-                child: AppText.appText("USAMA SHOAIB",
-                    fontSize: 20,
+                padding: const EdgeInsets.only(top: 10.0, bottom: 30),
+                child: AppText.appText("$userName",
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    textColor: AppTheme.appColor),
+                    textColor: AppTheme.black),
               ),
-              _buildProfileOption(Icons.email, "Talhamasnsha@gmail.com",
-                  "assets/images/email.png"),
-              _buildProfileOption(
-                  Icons.phone, "0320-9469594", "assets/images/phone.png"),
-              _buildProfileOption(
-                  Icons.location_on, "Lahore", "assets/images/loc.png"),
-              _buildProfileOption(
-                  Icons.settings, "Settings", "assets/images/settings.png"),
-              _buildProfileOption(Icons.help, "Help", "assets/images/help.png"),
-              _buildProfileOption(
-                Icons.logout,
-                "Logout",
-                "assets/images/logOut.png",
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return const CustomPopUp();
-                    },
-                  );
-                },
-              ),
+              if (isEdit == false)
+                Column(
+                  children: [
+                    _buildProfileOption(
+                        Icons.email, "$userEmail", "assets/images/email.png"),
+                    _buildProfileOption(Icons.phone, "$userPhoneNum",
+                        "assets/images/phone.png"),
+                    _buildProfileOption(Icons.settings, "Settings",
+                        "assets/images/settings.png"),
+                    _buildProfileOption(
+                        Icons.help, "Help", "assets/images/help.png"),
+                    _buildProfileOption(
+                      Icons.logout,
+                      "Logout",
+                      "assets/images/logOut.png",
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return const CustomPopUp();
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              if (isEdit == true)
+                Column(
+                  children: [
+                    EditField(
+                        label: "User Name",
+                        hintText: "Usama Shoaib",
+                        controller: _lableController),
+                    EditField(
+                        label: "Phone Number",
+                        hintText: "03134598073",
+                        controller: _phoneController),
+                    EditField(
+                        label: "Password",
+                        hintText: "Password",
+                        isPassword: true,
+                        controller: _passwordController),
+                    EditField(
+                        label: "Confirm Password",
+                        hintText: "Confirm Password",
+                        isPassword: true,
+                        controller: _confirmPassController),
+                  ],
+                ),
               SizedBox(
                 height: 30,
               ),
               if (isEdit == true)
                 Column(
                   children: [
-                    AppButton.appButton("Update", context: context, width: 261),
+                    AppButton.appButton("Update", onTap: () {
+                      if (pickedFilePath != null ||
+                          _lableController.text.isNotEmpty ||
+                          _phoneController.text.isNotEmpty ||
+                          _passwordController.text.isNotEmpty ||
+                          _confirmPassController.text.isNotEmpty) {
+                        updateProfile(context: context);
+                      } else {
+                        setState(() {
+                          isEdit = false;
+                        });
+                      }
+                    }, context: context, width: 261),
                     SizedBox(
                       height: 30,
                     )
@@ -174,7 +266,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildProfileOption(IconData icon, String text, String img,
       {Function()? onTap}) {
     return SizedBox(
-      height: 65,
+      height: 75,
       width: ScreenSize(context).width,
       child: GestureDetector(
         onTap: onTap,
@@ -186,19 +278,88 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration: BoxDecoration(
                     shape: BoxShape.circle, color: Color(0xffE4E4E4)),
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Image.asset(
                     img,
                     height: 22,
                   ),
                 )),
             SizedBox(
-              width: 15,
+              width: 20,
             ),
             AppText.appText(text, fontSize: 18, fontWeight: FontWeight.w600)
           ],
         ),
       ),
     );
+  }
+
+  /////////////////////////////  API"S ///////////////////////////
+  void getProfile({context}) async {
+    try {
+      Response response = await dio.get(path: AppUrls.getProfile);
+      if (response.statusCode == 200) {
+        setState(() async {
+          var profileData = response.data["data"];
+          var userName = profileData["name"];
+          var userMail = profileData["email"];
+          var userNumber = profileData["phone_no"];
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+
+          prefs.setString(PrefKey.fullName, userName);
+          prefs.setString(PrefKey.email, userMail);
+          prefs.setString(PrefKey.phone, userNumber);
+          _lableController.text = userName!;
+          _phoneController.text = userPhoneNum!;
+
+          getLocalProfile();
+        });
+      } else if (response.statusCode == 401) {
+        navigateFunction(context: context);
+      } else {
+        ToastHelper.displayErrorMotionToast(
+            context: context, msg: "${response.data["message"]}");
+      }
+    } catch (e) {
+      ToastHelper.displayErrorMotionToast(
+          context: context, msg: "Something went wrong.");
+    }
+  }
+
+  void updateProfile({context}) async {
+    try {
+      // Prepare FormData
+      FormData formData = FormData.fromMap({
+        "name": _lableController.text,
+        "password": _passwordController.text,
+        "password_confirmation": _confirmPassController.text,
+        "phone_no": _phoneController.text,
+        "profile_image": pickedFilePath != null
+            ? await MultipartFile.fromFile(pickedFilePath!,
+                filename: pickedFilePath!.split('/').last)
+            : null, // Send image if selected
+      });
+
+      Response response = await dio.post(
+        path: AppUrls.updateProfile,
+        data: formData,
+      );
+      if (response.statusCode == 200) {
+        ToastHelper.displaySuccessMotionToast(
+            context: context, msg: "Update successfully!");
+        setState(() {
+          isEdit = false;
+          getProfile();
+        });
+      } else if (response.statusCode == 401) {
+        navigateFunction(context: context);
+      } else {
+        ToastHelper.displayErrorMotionToast(
+            context: context, msg: "${response.data["message"]}");
+      }
+    } catch (e) {
+      ToastHelper.displayErrorMotionToast(
+          context: context, msg: "Something went wrong.");
+    }
   }
 }
