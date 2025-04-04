@@ -558,7 +558,6 @@ class _BookingStatusState extends State<BookingStatus> {
   }
 
   void showCancelBookingDialog(BuildContext context, {id}) {
-    print("object$id");
     showDialog(
       context: context,
       barrierDismissible: true, // Prevent closing by tapping outside

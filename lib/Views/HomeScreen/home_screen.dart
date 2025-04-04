@@ -40,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late AppDio dio;
   Map<String, dynamic>? conData;
   AppLogger logger = AppLogger();
+  String? userPic;
   Future<List<dynamic>>? availableRoomsFuture;
 
   @override
@@ -56,6 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       userName = pref.getString(PrefKey.fullName);
+      userPic = pref.getString(PrefKey.profilePic);
+
     });
   }
 
@@ -112,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 200,
                     width: MediaQuery.of(context).size.width,
                     color: AppTheme.appColor,
-                    child: Homewidgets.homeAppBar(name: userName),
+                    child: Homewidgets.homeAppBar(name: userName, picture: userPic),
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,

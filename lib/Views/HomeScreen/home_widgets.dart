@@ -60,8 +60,8 @@ class Homewidgets {
     );
   }
 
-  ///////////////////////////////////////// 
-  static homeAppBar({name}) {
+  /////////////////////////////////////////
+  static homeAppBar({name, picture}) {
     return Padding(
       padding:
           const EdgeInsets.only(top: 50.0, left: 20, right: 20, bottom: 20),
@@ -74,8 +74,25 @@ class Homewidgets {
               Container(
                 height: 60,
                 width: 60,
-                decoration:
-                    BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey,
+                ),
+                child: picture == null
+                    ? Icon(Icons.person)
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: Image.network(
+                          picture,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.person,
+                                size: 50, color: AppTheme.white);
+                          },
+                        ),
+                      ),
               ),
               const SizedBox(
                 width: 15,

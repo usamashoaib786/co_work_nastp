@@ -14,6 +14,7 @@ import 'package:co_work_nastp/config/dio/app_logger.dart';
 import 'package:co_work_nastp/config/dio/dio.dart';
 import 'package:co_work_nastp/config/keys/urls.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,7 +27,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String? pickedFilePath;
+  String? _pickedFilePath;
   bool? isEdit = false;
   String? userName;
   String? userEmail;
@@ -38,13 +39,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _confirmPassController = TextEditingController();
   pickImage() async {
     final ImagePicker picker = ImagePicker();
-
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        pickedFilePath = image.path;
-      });
+    if (image == null) {
+      if (kDebugMode) {
+        print("No image selected");
+      }
+      return;
     }
+
+    setState(() {
+      _pickedFilePath = image.path;
+    });
   }
 
   bool isLoading = false;
@@ -73,27 +78,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          CustomAppBar(txt: "Profile", leadIcon: true, onTap: () {
-          pushUntil(context, BottomNavView());
-          }, action: [
-        PopupMenuButton<String>(
-          color: AppTheme.white,
-          onSelected: (value) {
-            if (value == 'edit') {
-              setState(() {
-                isEdit = true;
-              });
-            }
+      appBar: CustomAppBar(
+          txt: "Profile",
+          leadIcon: true,
+          onTap: () {
+            pushUntil(context, BottomNavView());
           },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: "edit",
-              child: Text("Edit"),
+          action: [
+            PopupMenuButton<String>(
+              color: AppTheme.white,
+              onSelected: (value) {
+                if (value == 'edit') {
+                  setState(() {
+                    isEdit = true;
+                  });
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: "edit",
+                  child: Text("Edit"),
+                ),
+              ],
             ),
-          ],
-        ),
-      ]),
+          ]),
       body: Padding(
         padding: const EdgeInsets.only(
           left: 20.0,
@@ -113,8 +121,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Card(
                         elevation: 5,
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(
-                                width: 2, color: AppTheme.appColor),
+                            side:
+                                BorderSide(width: 2, color: AppTheme.appColor),
                             borderRadius: BorderRadius.circular(100)),
                         child: Container(
                             height: 120,
@@ -122,27 +130,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             decoration: BoxDecoration(
                                 color: AppTheme.appColor,
                                 shape: BoxShape.circle),
-                            child: userPic != null
-                                ? Image.network(
-                                    userPic!,
-                                    width: 120,
-                                    height: 120,
-                                    fit: BoxFit.cover,
-                                    errorBuilder:
-                                        (context, error, stackTrace) {
-                                      return Icon(Icons.person,
-                                          size: 50, color: AppTheme.white);
-                                    },
+                            child: _pickedFilePath != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(100),
+                                    child: Image.file(
+                                      File(_pickedFilePath!),
+                                      width: 200,
+                                      height: 200,
+                                      fit: BoxFit.fill,
+                                    ),
                                   )
-                                : pickedFilePath != null
+                                : userPic != null
                                     ? ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(100),
-                                        child: Image.file(
-                                          File(pickedFilePath!),
-                                          width: 200,
-                                          height: 200,
-                                          fit: BoxFit.fill,
+                                        child: Image.network(
+                                          userPic!,
+                                          width: 120,
+                                          height: 120,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Icon(Icons.person,
+                                                size: 50,
+                                                color: AppTheme.white);
+                                          },
                                         ),
                                       )
                                     : Padding(
@@ -239,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Column(
                   children: [
                     AppButton.appButton("Update", onTap: () {
-                      if (pickedFilePath != null ||
+                      if (_pickedFilePath != null ||
                           _lableController.text.isNotEmpty ||
                           _phoneController.text.isNotEmpty ||
                           _passwordController.text.isNotEmpty ||
@@ -304,11 +316,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           var userName = profileData["name"];
           var userMail = profileData["email"];
           var userNumber = profileData["phone_no"];
+          var userProfile = profileData["profile_image"];
+
           SharedPreferences prefs = await SharedPreferences.getInstance();
 
           prefs.setString(PrefKey.fullName, userName);
           prefs.setString(PrefKey.email, userMail);
           prefs.setString(PrefKey.phone, userNumber);
+          prefs.setString(PrefKey.profilePic, userProfile);
           _lableController.text = userName!;
           _phoneController.text = userPhoneNum!;
 
@@ -334,9 +349,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         "password": _passwordController.text,
         "password_confirmation": _confirmPassController.text,
         "phone_no": _phoneController.text,
-        "profile_image": pickedFilePath != null
-            ? await MultipartFile.fromFile(pickedFilePath!,
-                filename: pickedFilePath!.split('/').last)
+        "profile_image": _pickedFilePath != null
+            ? await MultipartFile.fromFile(_pickedFilePath!,
+                filename: _pickedFilePath!.split('/').last)
             : null, // Send image if selected
       });
 
